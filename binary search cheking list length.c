@@ -18,7 +18,7 @@ bool search(int value, int values[], int n)
         }
         else if (values[middle] > value)
         {
-            list = end - start;
+            list = end - middle;
             end = middle -1;
             middle = (start + end) / 2;
         }
