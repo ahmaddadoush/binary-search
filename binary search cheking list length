@@ -1,3 +1,8 @@
+/*
+C language.
+ Written by : Ahmad Dadoush.
+ */
+
 bool search(int value, int values[], int n)
 {
     // Binary search.
