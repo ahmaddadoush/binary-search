@@ -15,6 +15,7 @@ typedef struct Symbol
 void toHack(FILE* symbolLess, FILE* output);
 void removeWhtieSP(FILE *source, FILE *dest);
 void toSymbolLess(FILE* source, FILE* dest);
+char* itoa(int val, int base);
 int main(int argc, char* argv[])
 {
 	if (argc < 2)
@@ -91,14 +92,14 @@ void toHack(FILE* symbolLess, FILE* output)
 	char* out = calloc(16, sizeof(char));
 	int outSize = 16;
 	int lineNum = 0;
-	while (feof(symbolLess) == 0)
-	{
 
+	while (feof(symbolLess) == 0)
+	{ 
 		fgets(line, 17, symbolLess);
 		if (line != NULL)
 		{
 			int lineLen = strlen(line);
-			//printf("%s" , line);
+			//printf("the line: %s" , line);
 
 			if (line[0] == '@')
 			{
@@ -106,8 +107,7 @@ void toHack(FILE* symbolLess, FILE* output)
 				// Remeber value of A
 				int Aval = atoi(strtok(line, "@"));
 				// copy binary value of A as String to temp
-				char* malloc1 = malloc(sizeof(char)*outSize);
-				itoa(Aval, malloc1, 2);
+				char* malloc1 = itoa(Aval, 2);
 				// initialize first 0 (A instruction op)
 				out[0] = '0';
 				// Write zeros for not used bits
@@ -115,16 +115,17 @@ void toHack(FILE* symbolLess, FILE* output)
 				for (i = 1; i < outSize - strlen(malloc1); i++) { out[i] = '0'; }
 				// continue the previous loop to copy the temp string to out
 				int k = 0;
-				for (i; i<outSize; i++)
+				int j;
+				for (j = i; j<outSize; j++)
 				{
-					out[i] = malloc1[k];
+					out[j] = malloc1[k];
 					k++;
 				}
 				// if it's the first line don't write newline
 				if (lineNum > 0) fputc('\n', output);
 				// write the out string to output file
+				//printf("out is%s\n" , out);
 				fwrite(out, sizeof(char), (size_t)outSize, output);
-				//free(malloc1);
 			}
 			else
 			{
@@ -179,22 +180,26 @@ void toHack(FILE* symbolLess, FILE* output)
 
 				if (comp[0] == '=')
 				{
-					comp = strncpy(comp, &comp[1], (size_t)(compLen - 1));
-					comp[compLen - 1] = (char) '\0';
+					int i;
+					for(i = 0 ; i < compLen -1 ; i++)
+					{
+						comp[i] = comp[i+1];
+					}
+					comp[compLen-1] = '\0';
 				}
-				//printf("Comp: %s\n" , comp);
-				if (strcmp(comp, "0") == 0) { out[3] = '0'; out[4] = '1'; out[5] = '0'; out[6] = '1'; out[7] = '0'; out[8] = '1'; out[9] = '0'; }
-				else if (strcmp(comp, "1") == 0) { out[3] = '0'; out[4] = '1'; out[5] = '1'; out[6] = '1'; out[7] = '1'; out[8] = '1'; out[9] = '1'; }
-				else if (strcmp(comp, "-1") == 0) { out[3] = '0'; out[4] = '1'; out[5] = '1'; out[6] = '1'; out[7] = '0'; out[8] = '1'; out[9] = '0'; }
-				else if (strcmp(comp, "D") == 0) { out[3] = '0'; out[4] = '0'; out[5] = '0'; out[6] = '1'; out[7] = '1'; out[8] = '0'; out[9] = '0'; }
-				else if (strcmp(comp, "A") == 0) { out[3] = '0'; out[4] = '1'; out[5] = '1'; out[6] = '0'; out[7] = '0'; out[8] = '0'; out[9] = '0'; }
-				else if (strcmp(comp, "M") == 0) { out[3] = '1'; out[4] = '1'; out[5] = '1'; out[6] = '0'; out[7] = '0'; out[8] = '0'; out[9] = '0'; }
-				else if (strcmp(comp, "!D") == 0) { out[3] = '0'; out[4] = '0'; out[5] = '0'; out[6] = '1'; out[7] = '1'; out[8] = '0'; out[9] = '1'; }
-				else if (strcmp(comp, "!A") == 0) { out[3] = '0'; out[4] = '1'; out[5] = '1'; out[6] = '0'; out[7] = '0'; out[8] = '0'; out[9] = '1'; }
-				else if (strcmp(comp, "!M") == 0) { out[3] = '1'; out[4] = '1'; out[5] = '1'; out[6] = '0'; out[7] = '0'; out[8] = '0'; out[9] = '1'; }
-				else if (strcmp(comp, "-D") == 0) { out[3] = '0'; out[4] = '0'; out[5] = '0'; out[6] = '1'; out[7] = '1'; out[8] = '1'; out[9] = '1'; }
-				else if (strcmp(comp, "-A") == 0) { out[3] = '0'; out[4] = '1'; out[5] = '1'; out[6] = '0'; out[7] = '0'; out[8] = '1'; out[9] = '1'; }
-				else if (strcmp(comp, "-M") == 0) { out[3] = '1'; out[4] = '1'; out[5] = '1'; out[6] = '0'; out[7] = '0'; out[8] = '1'; out[9] = '1'; }
+				//printf("Comp: %s" , comp);
+				if (strcmp(comp, "0") == 0)        { out[3] = '0'; out[4] = '1'; out[5] = '0'; out[6] = '1'; out[7] = '0'; out[8] = '1'; out[9] = '0'; }
+				else if (strcmp(comp, "1") == 0)   { out[3] = '0'; out[4] = '1'; out[5] = '1'; out[6] = '1'; out[7] = '1'; out[8] = '1'; out[9] = '1'; }
+				else if (strcmp(comp, "-1") == 0)  { out[3] = '0'; out[4] = '1'; out[5] = '1'; out[6] = '1'; out[7] = '0'; out[8] = '1'; out[9] = '0'; }
+				else if (strcmp(comp, "D") == 0)   { out[3] = '0'; out[4] = '0'; out[5] = '0'; out[6] = '1'; out[7] = '1'; out[8] = '0'; out[9] = '0'; }
+				else if (strcmp(comp, "A") == 0)   { out[3] = '0'; out[4] = '1'; out[5] = '1'; out[6] = '0'; out[7] = '0'; out[8] = '0'; out[9] = '0'; }
+				else if (strcmp(comp, "M") == 0)   { out[3] = '1'; out[4] = '1'; out[5] = '1'; out[6] = '0'; out[7] = '0'; out[8] = '0'; out[9] = '0'; }
+				else if (strcmp(comp, "!D") == 0)  { out[3] = '0'; out[4] = '0'; out[5] = '0'; out[6] = '1'; out[7] = '1'; out[8] = '0'; out[9] = '1'; }
+				else if (strcmp(comp, "!A") == 0)  { out[3] = '0'; out[4] = '1'; out[5] = '1'; out[6] = '0'; out[7] = '0'; out[8] = '0'; out[9] = '1'; }
+				else if (strcmp(comp, "!M") == 0)  { out[3] = '1'; out[4] = '1'; out[5] = '1'; out[6] = '0'; out[7] = '0'; out[8] = '0'; out[9] = '1'; }
+				else if (strcmp(comp, "-D") == 0)  { out[3] = '0'; out[4] = '0'; out[5] = '0'; out[6] = '1'; out[7] = '1'; out[8] = '1'; out[9] = '1'; }
+				else if (strcmp(comp, "-A") == 0)  { out[3] = '0'; out[4] = '1'; out[5] = '1'; out[6] = '0'; out[7] = '0'; out[8] = '1'; out[9] = '1'; }
+				else if (strcmp(comp, "-M") == 0)  { out[3] = '1'; out[4] = '1'; out[5] = '1'; out[6] = '0'; out[7] = '0'; out[8] = '1'; out[9] = '1'; }
 				else if (strcmp(comp, "D+1") == 0) { out[3] = '0'; out[4] = '0'; out[5] = '1'; out[6] = '1'; out[7] = '1'; out[8] = '1'; out[9] = '1'; }
 				else if (strcmp(comp, "A+1") == 0) { out[3] = '0'; out[4] = '1'; out[5] = '1'; out[6] = '0'; out[7] = '1'; out[8] = '1'; out[9] = '1'; }
 				else if (strcmp(comp, "M+1") == 0) { out[3] = '1'; out[4] = '1'; out[5] = '1'; out[6] = '0'; out[7] = '1'; out[8] = '1'; out[9] = '1'; }
@@ -214,8 +219,9 @@ void toHack(FILE* symbolLess, FILE* output)
 
 				if (lineNum > 0) fputc('\n', output);
 				// write the out string to output file
+				//printf("out is%s\n" , out);
 				fwrite(out, sizeof(char), (size_t)outSize, output);
-				//free(lineCpy);
+				free(lineCpy);
 			}
 		}
 		lineNum++;
@@ -239,7 +245,7 @@ void removeWhtieSP(FILE *source, FILE *dest) {
 			//printf("%s eol" , line);
 			lineLen = strlen(line2);
 			// if the line is only new line ignore it
-			if (line2[0] == '\n') { continue; }
+			if (strncmp(line2 , "\n" , 1) == 0) continue;
 			else
 			{
 				int i;
@@ -257,7 +263,7 @@ void removeWhtieSP(FILE *source, FILE *dest) {
 				}
 				// terminate the out string
 				out[o] = '\0';
-				outLen = o + 1;
+				outLen = o ;
 				//printf("out length: %i\n" , outLen);
 				//printf("this is out index: %i\n" , o);
 				//printf("%s" , line);
@@ -391,6 +397,7 @@ void toSymbolLess(FILE* source, FILE* dest)
 	*/
 	// third pass over file to read and subtitute the lables and variables with their adresses
 	rewind(source);
+
 	while (feof(source) == 0)
 	{
 		char* line = calloc(100, sizeof(char));
@@ -398,37 +405,40 @@ void toSymbolLess(FILE* source, FILE* dest)
 
 		int lineLen = 0;
 		if (line != NULL)
-		{
+		{   
 			lineLen = strlen(line);
-			if (line[0] == '@')
-			{
+			if (line[0] == '@' && isalpha(line[1]))
+			{    
 				Symbol* trav2 = table;
 				int i;
 				for (i = 0; i < index; i++)
 				{
 					if (strncmp(&line[1], trav2->name, (size_t)(lineLen - 2)) == 0)
 					{
+					    
 						// this to know how many digits are there in the relative address
 						int nDigits = (int)((trav2->mAddress == 0) ? 1 : floor(log10(abs(trav2->mAddress))) + 1);
-
-						char* malloc3 = malloc(sizeof(char)*nDigits);
-						itoa(trav2->mAddress, malloc3, 10);
-						strncpy(&line[1], malloc3, (size_t)nDigits);
+                        char* temp = itoa(trav2->mAddress, 10);
+                        if(strcmp(temp , "\0") == 0) temp="0";
+                        
+						strncpy(&line[1],temp , (size_t)nDigits);
 						line[nDigits + 1] = '\n';
 						line[nDigits + 2] = '\0';
+						//printf("line %s" , line);
 					}
 					trav2 = trav2->next;
 				}
 			}
 			else if ((line[0] == '(') && (strchr(line, ')') != NULL)) { line[0] = '\0'; } // if lable ignore it
+			lineLen = strlen(line);
+		    if (lineLen>0) fputs(line, dest);
 		}
-		lineLen = strlen(line);
-		if (lineLen>0) fputs(line, dest);
+		
 		free(line);
 	}
 	Symbol* trav4 = table;
 	int y;
-	for (y = 0; y<index; y++)
+	for (y = 0; y<=index; y++)
 	{
 		trav4 = trav4->next;
 		free(table);
@@ -440,3 +450,17 @@ void toSymbolLess(FILE* source, FILE* dest)
 
 
 
+
+char* itoa(int val, int base){
+
+	static char buf[32] = {0};
+
+	int i = 30;
+
+	for(; val && i ; --i, val /= base)
+
+		buf[i] = "0123456789abcdef"[val % base];
+
+	return &buf[i+1];
+
+}
