@@ -8,7 +8,7 @@
 
 typedef struct Symbol
 {
-	char name[50];
+	char* name;
 	int mAddress;
 	struct Symbol* next;
 }Symbol;
@@ -137,7 +137,7 @@ void toHack(FILE* symbolLess, FILE* output)
 				out[0] = '1'; out[1] = '1'; out[2] = '1';
 
 				// take a copy frome line
-				char* lineCpy = malloc(sizeof(char)*lineLen);
+				char* lineCpy = malloc(sizeof(char)*lineLen+1);
 				// x is for determine how many characters should i copy from line excluding '\n'
 				int x = (line[lineLen - 1] == '\n') ? 1 : 0;
 				strncpy(lineCpy, line, (size_t)(lineLen - x));
@@ -185,8 +185,9 @@ void toHack(FILE* symbolLess, FILE* output)
 					{
 						comp[i] = comp[i+1];
 					}
-					comp[compLen-1] = '\0';
+					compLen--;
 				}
+				comp[compLen] = '\0';
 				//printf("Comp: %s" , comp);
 				if (strcmp(comp, "0") == 0)        { out[3] = '0'; out[4] = '1'; out[5] = '0'; out[6] = '1'; out[7] = '0'; out[8] = '1'; out[9] = '0'; }
 				else if (strcmp(comp, "1") == 0)   { out[3] = '0'; out[4] = '1'; out[5] = '1'; out[6] = '1'; out[7] = '1'; out[8] = '1'; out[9] = '1'; }
@@ -234,18 +235,19 @@ void removeWhtieSP(FILE *source, FILE *dest) {
 	int lineLen = 0;
 	char out[60];
 	int outLen = 0;
+	char* line2 = calloc(300, sizeof(char));
 	while (feof(source) == 0)
 	{
 		// read a line
 		// allocate memory for line variable
-		char* line2 = calloc(300, sizeof(char));
+		
 		fgets(line2, 251, source);
 		if (line2 != NULL)
 		{
 			//printf("%s eol" , line);
 			lineLen = strlen(line2);
 			// if the line is only new line ignore it
-			if (strncmp(line2 , "\n" , 1) == 0) continue;
+			if (isspace(line2[0])) continue;
 			else
 			{
 				int i;
@@ -273,10 +275,9 @@ void removeWhtieSP(FILE *source, FILE *dest) {
 			//printf("NE LINE\n");
 			if (outLen > 0) { fputs(&out[0], dest); }
 		}
-		free(line2);
-		line2 = NULL;
+		
 	}
-
+	free(line2);
 }
 
 void toSymbolLess(FILE* source, FILE* dest)
@@ -285,30 +286,31 @@ void toSymbolLess(FILE* source, FILE* dest)
 
 	int index = 0;
 	Symbol* table = malloc(sizeof(Symbol));
+	table->name = malloc(sizeof(char) * 50);
 	Symbol* trav = table;
-	strcpy(trav->name, "SCREEN"); trav->mAddress = 16384; trav->next = malloc(sizeof(Symbol)); trav = trav->next; index++;
-	strcpy(trav->name, "KBD"); trav->mAddress = 24576; trav->next = malloc(sizeof(Symbol)); trav = trav->next; index++;
-	strcpy(trav->name, "SP"); trav->mAddress = 0; trav->next = malloc(sizeof(Symbol)); trav = trav->next; index++;
-	strcpy(trav->name, "LCL"); trav->mAddress = 1; trav->next = malloc(sizeof(Symbol)); trav = trav->next; index++;
-	strcpy(trav->name, "ARG"); trav->mAddress = 2; trav->next = malloc(sizeof(Symbol)); trav = trav->next; index++;
-	strcpy(trav->name, "THIS"); trav->mAddress = 3; trav->next = malloc(sizeof(Symbol)); trav = trav->next; index++;
-	strcpy(trav->name, "THAT"); trav->mAddress = 4; trav->next = malloc(sizeof(Symbol)); trav = trav->next; index++;
-	strcpy(trav->name, "R0"); trav->mAddress = 0; trav->next = malloc(sizeof(Symbol)); trav = trav->next; index++;
-	strcpy(trav->name, "R1"); trav->mAddress = 1; trav->next = malloc(sizeof(Symbol)); trav = trav->next; index++;
-	strcpy(trav->name, "R2"); trav->mAddress = 2; trav->next = malloc(sizeof(Symbol)); trav = trav->next; index++;
-	strcpy(trav->name, "R3"); trav->mAddress = 3; trav->next = malloc(sizeof(Symbol)); trav = trav->next; index++;
-	strcpy(trav->name, "R4"); trav->mAddress = 4; trav->next = malloc(sizeof(Symbol)); trav = trav->next; index++;
-	strcpy(trav->name, "R5"); trav->mAddress = 5; trav->next = malloc(sizeof(Symbol)); trav = trav->next; index++;
-	strcpy(trav->name, "R6"); trav->mAddress = 6; trav->next = malloc(sizeof(Symbol)); trav = trav->next; index++;
-	strcpy(trav->name, "R7"); trav->mAddress = 7; trav->next = malloc(sizeof(Symbol)); trav = trav->next; index++;
-	strcpy(trav->name, "R8"); trav->mAddress = 8; trav->next = malloc(sizeof(Symbol)); trav = trav->next; index++;
-	strcpy(trav->name, "R9"); trav->mAddress = 9; trav->next = malloc(sizeof(Symbol)); trav = trav->next; index++;
-	strcpy(trav->name, "R10"); trav->mAddress = 10; trav->next = malloc(sizeof(Symbol)); trav = trav->next; index++;
-	strcpy(trav->name, "R11"); trav->mAddress = 11; trav->next = malloc(sizeof(Symbol)); trav = trav->next; index++;
-	strcpy(trav->name, "R12"); trav->mAddress = 12; trav->next = malloc(sizeof(Symbol)); trav = trav->next; index++;
-	strcpy(trav->name, "R13"); trav->mAddress = 13; trav->next = malloc(sizeof(Symbol)); trav = trav->next; index++;
-	strcpy(trav->name, "R14"); trav->mAddress = 14; trav->next = malloc(sizeof(Symbol)); trav = trav->next; index++;
-	strcpy(trav->name, "R15"); trav->mAddress = 15; trav->next = malloc(sizeof(Symbol)); trav = trav->next; index++;
+	strcpy(trav->name, "SCREEN"); trav->mAddress = 16384; trav->next = malloc(sizeof(Symbol));trav->next->name = malloc(sizeof(char)*50); trav = trav->next; index++;
+	strcpy(trav->name, "KBD"); trav->mAddress = 24576; trav->next = malloc(sizeof(Symbol));trav->next->name = malloc(sizeof(char)*50); trav = trav->next; index++;
+	strcpy(trav->name, "SP"); trav->mAddress = 0; trav->next = malloc(sizeof(Symbol));trav->next->name = malloc(sizeof(char)*50); trav = trav->next; index++;
+	strcpy(trav->name, "LCL"); trav->mAddress = 1; trav->next = malloc(sizeof(Symbol));trav->next->name = malloc(sizeof(char)*50); trav = trav->next; index++;
+	strcpy(trav->name, "ARG"); trav->mAddress = 2; trav->next = malloc(sizeof(Symbol));trav->next->name = malloc(sizeof(char)*50); trav = trav->next; index++;
+	strcpy(trav->name, "THIS"); trav->mAddress = 3; trav->next = malloc(sizeof(Symbol));trav->next->name = malloc(sizeof(char)*50); trav = trav->next; index++;
+	strcpy(trav->name, "THAT"); trav->mAddress = 4; trav->next = malloc(sizeof(Symbol));trav->next->name = malloc(sizeof(char)*50); trav = trav->next; index++;
+	strcpy(trav->name, "R0"); trav->mAddress = 0; trav->next = malloc(sizeof(Symbol));trav->next->name = malloc(sizeof(char)*50); trav = trav->next; index++;
+	strcpy(trav->name, "R1"); trav->mAddress = 1; trav->next = malloc(sizeof(Symbol));trav->next->name = malloc(sizeof(char)*50); trav = trav->next; index++;
+	strcpy(trav->name, "R2"); trav->mAddress = 2; trav->next = malloc(sizeof(Symbol));trav->next->name = malloc(sizeof(char)*50); trav = trav->next; index++;
+	strcpy(trav->name, "R3"); trav->mAddress = 3; trav->next = malloc(sizeof(Symbol));trav->next->name = malloc(sizeof(char)*50); trav = trav->next; index++;
+	strcpy(trav->name, "R4"); trav->mAddress = 4; trav->next = malloc(sizeof(Symbol));trav->next->name = malloc(sizeof(char)*50); trav = trav->next; index++;
+	strcpy(trav->name, "R5"); trav->mAddress = 5; trav->next = malloc(sizeof(Symbol));trav->next->name = malloc(sizeof(char)*50); trav = trav->next; index++;
+	strcpy(trav->name, "R6"); trav->mAddress = 6; trav->next = malloc(sizeof(Symbol));trav->next->name = malloc(sizeof(char)*50); trav = trav->next; index++;
+	strcpy(trav->name, "R7"); trav->mAddress = 7; trav->next = malloc(sizeof(Symbol));trav->next->name = malloc(sizeof(char)*50); trav = trav->next; index++;
+	strcpy(trav->name, "R8"); trav->mAddress = 8; trav->next = malloc(sizeof(Symbol));trav->next->name = malloc(sizeof(char)*50); trav = trav->next; index++;
+	strcpy(trav->name, "R9"); trav->mAddress = 9; trav->next = malloc(sizeof(Symbol));trav->next->name = malloc(sizeof(char)*50); trav = trav->next; index++;
+	strcpy(trav->name, "R10"); trav->mAddress = 10; trav->next = malloc(sizeof(Symbol));trav->next->name = malloc(sizeof(char)*50); trav = trav->next; index++;
+	strcpy(trav->name, "R11"); trav->mAddress = 11; trav->next = malloc(sizeof(Symbol));trav->next->name = malloc(sizeof(char)*50); trav = trav->next; index++;
+	strcpy(trav->name, "R12"); trav->mAddress = 12; trav->next = malloc(sizeof(Symbol));trav->next->name = malloc(sizeof(char)*50); trav = trav->next; index++;
+	strcpy(trav->name, "R13"); trav->mAddress = 13; trav->next = malloc(sizeof(Symbol));trav->next->name = malloc(sizeof(char)*50); trav = trav->next; index++;
+	strcpy(trav->name, "R14"); trav->mAddress = 14; trav->next = malloc(sizeof(Symbol));trav->next->name = malloc(sizeof(char)*50); trav = trav->next; index++;
+	strcpy(trav->name, "R15"); trav->mAddress = 15; trav->next = malloc(sizeof(Symbol));trav->next->name = calloc(50,sizeof(char)); trav = trav->next; index++;
 
 
 	//printf("Name: %s Address: %i\n" , (table+0)->name , (table+0)->mAddress);
@@ -335,10 +337,12 @@ void toSymbolLess(FILE* source, FILE* dest)
 
 				//printf("%s\n" , &temp[0]);
 				//printf("LINE NUM: %i\n" , lineNum);
+				
 				strncpy(trav->name, &line[1], (size_t)(lineLen - 3));
 				trav->name[lineLen - 2] = '\0';
 				trav->mAddress = lineNum - lables; // labels is to know how many line will be skipped in third pass
 				trav->next = malloc(sizeof(Symbol));
+				trav->next->name = calloc(50,sizeof(char));
 				trav = trav->next;
 				lables++;
 				index++;
@@ -366,7 +370,7 @@ void toSymbolLess(FILE* source, FILE* dest)
 				int i;
 				for (i = 0; i < index; i++)
 				{
-					if (strncmp(&line[1], trav1->name, (size_t)(lineLen - 2)) == 0) found = true;
+					if (trav1->name != NULL && strncmp(&line[1], trav1->name, (size_t)(lineLen - 2)) == 0){found = true;} 
 					trav1 = trav1->next;
 				}
 				if (!found) // if not found in table so declare at as variable and give addrees in memory starting from 16
@@ -375,11 +379,13 @@ void toSymbolLess(FILE* source, FILE* dest)
 
 
 					// add it to table
-					strncpy(trav->name, &line[1], (size_t)(lineLen - 2));
-					trav->name[lineLen - 2] = '\0';
-					trav->mAddress = n;
-					trav->next = malloc(sizeof(Symbol));
-					trav = trav->next;
+					
+					strncpy(trav1->name, &line[1], (size_t)(lineLen - 2));
+					trav1->name[lineLen - 2] = '\0';
+					trav1->mAddress = n;
+					trav1->next = malloc(sizeof(Symbol));
+					trav1->next->name = calloc(50,sizeof(char));
+					trav1 = trav1->next;
 					n++;
 					index++;
 				}
@@ -387,14 +393,14 @@ void toSymbolLess(FILE* source, FILE* dest)
 		}
 		free(line);
 	}
-	/* Symbol* trav3 = table;
+	 /*Symbol* trav3 = table;
 	int j;
 	for(j=0;j < index ; j++)
 	{
 	printf("Name: %s Value: %i\n" , trav3->name , trav3->mAddress);
 	trav3 = trav3->next;
-	}
-	*/
+	}*/
+	
 	// third pass over file to read and subtitute the lables and variables with their adresses
 	rewind(source);
 
@@ -441,6 +447,7 @@ void toSymbolLess(FILE* source, FILE* dest)
 	for (y = 0; y<=index; y++)
 	{
 		trav4 = trav4->next;
+		free(table->name);
 		free(table);
 		table = trav4;
 	}
