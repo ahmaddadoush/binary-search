@@ -100,6 +100,7 @@ void toHack(FILE* symbolLess, FILE* output)
 		{
 			int lineLen = strlen(line);
 			//printf("the line: %s" , line);
+			if(strchr(line , '\r') != NULL) lineLen--;
 
 			if (line[0] == '@')
 			{
@@ -246,6 +247,7 @@ void removeWhtieSP(FILE *source, FILE *dest) {
 		{
 			//printf("%s eol" , line);
 			lineLen = strlen(line2);
+			//if(strchr(line2 , '\r') != NULL) lineLen--;
 			// if the line is only new line ignore it
 			if (isspace(line2[0])) continue;
 			else
@@ -258,6 +260,7 @@ void removeWhtieSP(FILE *source, FILE *dest) {
 					// if the character is space ignore it
 					if (line2[i] == ' ') { continue; }
 					else if (line2[i] == '\t') { continue; }
+					else if (line2[i] == '\r') {continue;}
 					else if (line2[i] == '\n' && o == 0) { break; }  // if we reach new line and no characters found move to next line
 					else if ((line2[i] == '/' && line2[i + 1] == '/') && o == 0) { break; } // if start of a line comment stop and move to next line
 					else if ((line2[i] == '/' && line2[i + 1] == '/') && o > 0) { out[o] = '\n'; o++; break; }  // if start if inline comment write a new line
@@ -324,7 +327,7 @@ void toSymbolLess(FILE* source, FILE* dest)
 		if (line != NULL)
 		{
 			int lineLen = strlen(line);
-
+			if(strchr(line , '\r') != NULL) lineLen--;
 			//printf("%i\n" , lineLen);
 			//printf("%s" , line);
 
@@ -363,6 +366,7 @@ void toSymbolLess(FILE* source, FILE* dest)
 		if (line != NULL)
 		{
 			int lineLen = strlen(line);
+			if(strchr(line , '\r') != NULL) lineLen--;
 			if (line[0] == '@' && isalpha(line[1]))
 			{
 				Symbol* trav1 = table;
@@ -413,6 +417,7 @@ void toSymbolLess(FILE* source, FILE* dest)
 		if (line != NULL)
 		{   
 			lineLen = strlen(line);
+			if(strchr(line , '\r') != NULL) lineLen--;
 			if (line[0] == '@' && isalpha(line[1]))
 			{    
 				Symbol* trav2 = table;
